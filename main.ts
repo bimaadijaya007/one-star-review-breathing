@@ -2,13 +2,22 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const LINE =
   "Breathing: runs itself perfectly until you think about it, then suddenly it's manual and you're doing it wrong.";
+const MAX_CHARS = 160;
 
-// Self-check: one line, non-blank, within the 160-character limit.
-if (LINE.length < 1 || LINE.length > 160) {
-  throw new Error(`entry line must be 1-160 characters, got ${LINE.length}`);
+// Self-check: one line, non-blank, within the character limit, no stray
+// whitespace at either end, and a full stop at the end.
+if (LINE.length < 1 || LINE.length > MAX_CHARS) {
+  throw new Error(
+    `entry line must be 1-${MAX_CHARS} characters, got ${LINE.length}`,
+  );
 }
-if (LINE.trim().length === 0 || LINE.includes("\n")) {
-  throw new Error("entry line must be a single non-blank line");
+if (LINE.trim() !== LINE || LINE.includes("\n")) {
+  throw new Error(
+    "entry line must be a single line with no leading or trailing whitespace",
+  );
+}
+if (!LINE.endsWith(".")) {
+  throw new Error("entry line must end with a full stop");
 }
 
 mkdirSync("/output", { recursive: true });
@@ -20,4 +29,4 @@ if (back !== LINE) {
   throw new Error("round-trip check failed: entry.txt does not match the line");
 }
 
-console.log("entry written: /output/entry.txt");
+console.log(`entry written: /output/entry.txt (${LINE.length} characters)`);
